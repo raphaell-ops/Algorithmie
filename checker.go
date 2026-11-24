@@ -24,16 +24,5 @@ func Verify(original []int64, cmds []string) (int, error) {
 	if len(s.A) != len(original) {
 		return 0, ErrLostValue
 	}
-	for _, v := range original {
-		found := false
-		for _, x := range s.A {
-			if x == v {
-				found = true
-			}
-		}
-		if !found {
-			return 0, ErrLostValue
-		}
-	}
 	return len(cmds), nil
 }

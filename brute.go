@@ -1,15 +1,12 @@
 package main
 
-// Budget : nombre maximum d'états qu'on accepte de garder en mémoire.
 const Budget = 100000
 
-// candidate : un état et la suite de commandes qui y mène.
 type candidate struct {
 	state *Stacks
 	cmds  []string
 }
 
-// BruteForce renvoie la suite la plus courte qui trie values.
 func BruteForce(values []int64) (cmds []string, found bool, explored int) {
 	start := NewStacks(values)
 	if start.IsSorted() {

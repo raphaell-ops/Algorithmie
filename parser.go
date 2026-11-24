@@ -6,7 +6,6 @@ import (
 	"strings"
 )
 
-// Les trois erreurs du parseur.
 var (
 	ErrSyntax    = errors.New("erreur de syntaxe")
 	ErrOverflow  = errors.New("dépassement numérique")
@@ -15,38 +14,31 @@ var (
 
 func validSyntax(s string) bool {
 	i := 0
-	if i < len(s) && (s[i] == '+' || s[i] == '-') {
+	if s[0] == '+' || s[0] == '-' {
 		i++
 	}
 	if i == len(s) {
 		return false
 	}
-	for i < len(s) {
+	for ; i < len(s); i++ {
 		if s[i] < '0' || s[i] > '9' {
 			return false
 		}
-		i++
 	}
 	return true
 }
 
-// ParseNumber convertit un jeton en int64.
-func ParseNumber(input string) (int64, bool, error) {
-	s := strings.TrimSpace(input)
-	if s == "" {
-		return 0, true, nil
-	}
+func ParseNumber(s string) (int64, error) {
 	if !validSyntax(s) {
-		return 0, false, ErrSyntax
+		return 0, ErrSyntax
 	}
 	n, err := strconv.ParseInt(s, 10, 64)
 	if err != nil {
-		return 0, false, ErrOverflow
+		return 0, ErrOverflow
 	}
-	return n, false, nil
+	return n, nil
 }
 
-// ParseArgs lit tous les arguments du programme.
 func ParseArgs(args []string) ([]int64, error) {
 	values := []int64{}
 	for _, arg := range args {
@@ -55,7 +47,7 @@ func ParseArgs(args []string) ([]int64, error) {
 			return nil, ErrSyntax
 		}
 		for _, tok := range tokens {
-			n, _, err := ParseNumber(tok)
+			n, err := ParseNumber(tok)
 			if err != nil {
 				return nil, err
 			}

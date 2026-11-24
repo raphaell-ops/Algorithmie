@@ -13,17 +13,14 @@ type Stacks struct {
 
 var ErrUnknown = errors.New("instruction inconnue")
 
-// Les 11 commandes du jeu.
 var Commands = []string{"sa", "sb", "ss", "pa", "pb", "ra", "rb", "rr", "rra", "rrb", "rrr"}
 
-// NewStacks crée l'état de départ.
 func NewStacks(values []int64) *Stacks {
 	a := make([]int64, len(values))
 	copy(a, values)
 	return &Stacks{A: a, B: []int64{}}
 }
 
-// Clone fait une copie complète des piles.
 func (s *Stacks) Clone() *Stacks {
 	a := make([]int64, len(s.A))
 	copy(a, s.A)
@@ -32,12 +29,10 @@ func (s *Stacks) Clone() *Stacks {
 	return &Stacks{A: a, B: b, Count: s.Count}
 }
 
-// Key renvoie un texte qui représente l'état, par exemple "[2 1] [3]".
 func (s *Stacks) Key() string {
 	return fmt.Sprint(s.A, s.B)
 }
 
-// IsSorted vérifie l'état final : B est vide et A est croissante.
 func (s *Stacks) IsSorted() bool {
 	if len(s.B) != 0 {
 		return false
@@ -50,7 +45,6 @@ func (s *Stacks) IsSorted() bool {
 	return true
 }
 
-// swap échange les deux premiers éléments.
 func swap(s []int64) {
 	if len(s) < 2 {
 		return
@@ -58,7 +52,6 @@ func swap(s []int64) {
 	s[0], s[1] = s[1], s[0]
 }
 
-// push prend le sommet de from et le met au sommet de to.
 func push(from, to *[]int64) {
 	if len(*from) == 0 {
 		return
@@ -68,7 +61,6 @@ func push(from, to *[]int64) {
 	*to = append([]int64{top}, *to...)
 }
 
-// rotate met le sommet au fond.
 func rotate(s []int64) {
 	if len(s) < 2 {
 		return
@@ -80,7 +72,6 @@ func rotate(s []int64) {
 	s[len(s)-1] = top
 }
 
-// reverseRotate met le fond au sommet (rien si moins de 2).
 func reverseRotate(s []int64) {
 	if len(s) < 2 {
 		return
@@ -92,7 +83,6 @@ func reverseRotate(s []int64) {
 	s[0] = bottom
 }
 
-// Exec applique une commande.
 func (s *Stacks) Exec(cmd string) error {
 	switch cmd {
 	case "sa":

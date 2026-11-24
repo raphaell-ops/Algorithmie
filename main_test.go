@@ -8,17 +8,15 @@ import (
 	"time"
 )
 
-// ============ J1 : le parseur ============
-
 func TestParseArgsValides(t *testing.T) {
 	tests := []struct {
 		args []string
 		want []int64
 	}{
-		{[]string{}, []int64{}},                          // aucun argument
-		{[]string{"3", "1", "2"}, []int64{3, 1, 2}},      // arguments simples
-		{[]string{"3 1", "2"}, []int64{3, 1, 2}},         // groupe + simple
-		{[]string{"+5", "-3", "007"}, []int64{5, -3, 7}}, // signes et zéros
+		{[]string{}, []int64{}},
+		{[]string{"3", "1", "2"}, []int64{3, 1, 2}},
+		{[]string{"3 1", "2"}, []int64{3, 1, 2}},
+		{[]string{"+5", "-3", "007"}, []int64{5, -3, 7}},
 		{[]string{"9223372036854775807"}, []int64{9223372036854775807}},
 		{[]string{"-9223372036854775808"}, []int64{-9223372036854775808}},
 	}
@@ -38,8 +36,8 @@ func TestParseArgsErreurs(t *testing.T) {
 		{[]string{"12a"}, ErrSyntax},
 		{[]string{"-"}, ErrSyntax},
 		{[]string{"1.5"}, ErrSyntax},
-		{[]string{""}, ErrSyntax},    // argument vide
-		{[]string{"   "}, ErrSyntax}, // argument blanc
+		{[]string{""}, ErrSyntax},
+		{[]string{"   "}, ErrSyntax},
 		{[]string{"99999999999999999999x"}, ErrSyntax},
 		{[]string{"9223372036854775808"}, ErrOverflow},
 		{[]string{"-9223372036854775809"}, ErrOverflow},
@@ -56,9 +54,6 @@ func TestParseArgsErreurs(t *testing.T) {
 	}
 }
 
-// ============ J2 : le moteur ============
-
-// Chaque commande appliquée une seule fois à A = [8 3 6] et B = [4 1].
 func TestCommandes(t *testing.T) {
 	tests := []struct {
 		cmd   string
@@ -90,8 +85,6 @@ func TestCommandes(t *testing.T) {
 	}
 }
 
-// Cas limites : pile vide ou d'un seul élément. Rien ne change,
-// mais la commande compte quand même pour 1.
 func TestCommandesCasLimites(t *testing.T) {
 	tests := []struct {
 		cmd          string
@@ -104,9 +97,9 @@ func TestCommandesCasLimites(t *testing.T) {
 		{"pb", []int64{}, []int64{2}, []int64{}, []int64{2}},
 		{"ra", []int64{1}, []int64{}, []int64{1}, []int64{}},
 		{"rra", []int64{}, []int64{}, []int64{}, []int64{}},
-		{"ss", []int64{1, 2}, []int64{3}, []int64{2, 1}, []int64{3}},      // seul A bouge
-		{"rr", []int64{}, []int64{1, 2, 3}, []int64{}, []int64{2, 3, 1}},  // seul B bouge
-		{"rrr", []int64{1, 2, 3}, []int64{}, []int64{3, 1, 2}, []int64{}}, // seul A bouge
+		{"ss", []int64{1, 2}, []int64{3}, []int64{2, 1}, []int64{3}},
+		{"rr", []int64{}, []int64{1, 2, 3}, []int64{}, []int64{2, 3, 1}},
+		{"rrr", []int64{1, 2, 3}, []int64{}, []int64{3, 1, 2}, []int64{}},
 	}
 	for _, tt := range tests {
 		s := NewStacks(tt.a)
@@ -131,7 +124,6 @@ func TestCommandeInconnue(t *testing.T) {
 	}
 }
 
-// L'entrée de départ ne doit pas être modifiée par le moteur.
 func TestEntreeConservee(t *testing.T) {
 	entree := []int64{3, 1, 2}
 	s := NewStacks(entree)
@@ -142,7 +134,6 @@ func TestEntreeConservee(t *testing.T) {
 	}
 }
 
-// Une copie faite avec Clone ne doit plus bouger.
 func TestCloneStable(t *testing.T) {
 	s := NewStacks([]int64{1, 2, 3})
 	copie := s.Clone()
@@ -152,8 +143,6 @@ func TestCloneStable(t *testing.T) {
 		t.Errorf("la copie a changé : A=%v B=%v", copie.A, copie.B)
 	}
 }
-
-// ============ J2 : le vérificateur ============
 
 func TestVerifyOK(t *testing.T) {
 	if _, err := Verify([]int64{}, []string{}); err != nil {
@@ -186,19 +175,16 @@ func TestVerifyErreurs(t *testing.T) {
 	}
 }
 
-// ============ J3 : brute-force ============
-
-// Résultats trouvés à la main.
 func TestBruteForce(t *testing.T) {
 	tests := []struct {
 		values []int64
-		k      int // nombre minimal de commandes
+		k      int
 	}{
 		{[]int64{1, 2, 3}, 0},
-		{[]int64{2, 1}, 1},    // sa
-		{[]int64{3, 1, 2}, 1}, // ra
-		{[]int64{2, 3, 1}, 1}, // rra
-		{[]int64{3, 2, 1}, 2}, // sa puis rra
+		{[]int64{2, 1}, 1},
+		{[]int64{3, 1, 2}, 1},
+		{[]int64{2, 3, 1}, 1},
+		{[]int64{3, 2, 1}, 2},
 	}
 	for _, tt := range tests {
 		cmds, found, _ := BruteForce(tt.values)
@@ -208,7 +194,6 @@ func TestBruteForce(t *testing.T) {
 	}
 }
 
-// Toutes les permutations de 1 à 5 : la suite trouvée doit être valide.
 func TestBruteForceToutesPermutations(t *testing.T) {
 	for n := 1; n <= 5; n++ {
 		perms := permutations(n)
@@ -234,14 +219,12 @@ func TestBruteForceToutesPermutations(t *testing.T) {
 	}
 }
 
-// permutations renvoie toutes les façons d'ordonner 1, 2, ..., n.
 func permutations(n int) [][]int64 {
 	if n == 0 {
 		return [][]int64{{}}
 	}
 	result := [][]int64{}
 	for _, p := range permutations(n - 1) {
-		// on insère n à chaque position possible
 		for pos := 0; pos <= len(p); pos++ {
 			q := []int64{}
 			q = append(q, p[:pos]...)
@@ -253,9 +236,6 @@ func permutations(n int) [][]int64 {
 	return result
 }
 
-// ============ J5 / J6 : les stratégies ============
-
-// Entrées de test variées.
 var entrees = [][]int64{
 	{},
 	{42},
@@ -279,14 +259,12 @@ func TestStrategiesValides(t *testing.T) {
 				t.Errorf("%s sur %v : %v", nom, e, err)
 			}
 		}
-		// Entrée vide, d'un élément ou déjà triée : aucune commande.
 		if len(f([]int64{})) != 0 || len(f([]int64{7})) != 0 || len(f([]int64{1, 2, 3})) != 0 {
 			t.Errorf("%s : des commandes pour une entrée déjà triée", nom)
 		}
 	}
 }
 
-// melange renvoie n nombres de 0 à n-1 dans un ordre aléatoire.
 func melange(r *rand.Rand, n int) []int64 {
 	values := make([]int64, n)
 	for i, v := range r.Perm(n) {
@@ -295,10 +273,8 @@ func melange(r *rand.Rand, n int) []int64 {
 	return values
 }
 
-// famille renvoie les entrées d'un type donné, toujours les mêmes
-// grâce à la graine fixe.
 func famille(nom string, n int) [][]int64 {
-	r := rand.New(rand.NewSource(int64(n))) // graine fixe
+	r := rand.New(rand.NewSource(int64(n)))
 	entrees := [][]int64{}
 	switch nom {
 	case "aléatoire":
@@ -317,7 +293,7 @@ func famille(nom string, n int) [][]int64 {
 			e[i] = int64(n - 1 - i)
 		}
 		entrees = append(entrees, e)
-	case "presque trié": // trié, puis 5 échanges de deux voisins
+	case "presque trié":
 		for k := 0; k < 5; k++ {
 			e := make([]int64, n)
 			for i := range e {
@@ -333,8 +309,6 @@ func famille(nom string, n int) [][]int64 {
 	return entrees
 }
 
-// Comparaison des stratégies sur les mêmes entrées.
-// go test -run Comparaison -v  pour voir les résultats.
 func TestComparaison(t *testing.T) {
 	strategies := []struct {
 		nom string
@@ -367,19 +341,17 @@ func TestComparaison(t *testing.T) {
 	}
 }
 
-// ============ J7 : le programme ============
-
 func TestProgramme(t *testing.T) {
 	tests := []struct {
 		args   []string
 		sortie string
 		ok     bool
 	}{
-		{[]string{}, "", true},              // aucun nombre
-		{[]string{"1", "2", "3"}, "", true}, // déjà trié
+		{[]string{}, "", true},
+		{[]string{"1", "2", "3"}, "", true},
 		{[]string{"2", "1"}, "sa\n", true},
-		{[]string{"1", "abc"}, "", false}, // erreur de syntaxe
-		{[]string{"1", "+1"}, "", false},  // doublon
+		{[]string{"1", "abc"}, "", false},
+		{[]string{"1", "+1"}, "", false},
 	}
 	for _, tt := range tests {
 		sortie, ok := run(tt.args)

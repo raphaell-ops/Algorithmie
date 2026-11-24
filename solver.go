@@ -1,12 +1,10 @@
 package main
 
-// do exécute une commande et l'ajoute à la liste.
 func do(s *Stacks, cmds []string, c string) []string {
 	s.Exec(c)
 	return append(cmds, c)
 }
 
-// minPosition renvoie la position du plus petit élément de la pile.
 func minPosition(pile []int64) int {
 	pos := 0
 	for i := 1; i < len(pile); i++ {
