@@ -12,52 +12,52 @@ var (
 	ErrDuplicate = errors.New("doublon")
 )
 
-func validSyntax(s string) bool {
-	i := 0
-	if s[0] == '+' || s[0] == '-' {
-		i++
+func syntaxeValide(texte string) bool {
+	debut := 0
+	if texte[0] == '+' || texte[0] == '-' {
+		debut = 1
 	}
-	if i == len(s) {
+	if debut == len(texte) {
 		return false
 	}
-	for ; i < len(s); i++ {
-		if s[i] < '0' || s[i] > '9' {
+	for i := debut; i < len(texte); i++ {
+		if texte[i] < '0' || texte[i] > '9' {
 			return false
 		}
 	}
 	return true
 }
 
-func ParseNumber(s string) (int64, error) {
-	if !validSyntax(s) {
+func ParseNumber(texte string) (int64, error) {
+	if !syntaxeValide(texte) {
 		return 0, ErrSyntax
 	}
-	n, err := strconv.ParseInt(s, 10, 64)
+	nombre, err := strconv.ParseInt(texte, 10, 64)
 	if err != nil {
 		return 0, ErrOverflow
 	}
-	return n, nil
+	return nombre, nil
 }
 
 func ParseArgs(args []string) ([]int64, error) {
-	values := []int64{}
+	valeurs := []int64{}
 	for _, arg := range args {
-		tokens := strings.Fields(arg)
-		if len(tokens) == 0 {
+		mots := strings.Fields(arg)
+		if len(mots) == 0 {
 			return nil, ErrSyntax
 		}
-		for _, tok := range tokens {
-			n, err := ParseNumber(tok)
+		for _, mot := range mots {
+			nombre, err := ParseNumber(mot)
 			if err != nil {
 				return nil, err
 			}
-			for _, v := range values {
-				if v == n {
+			for _, v := range valeurs {
+				if v == nombre {
 					return nil, ErrDuplicate
 				}
 			}
-			values = append(values, n)
+			valeurs = append(valeurs, nombre)
 		}
 	}
-	return values, nil
+	return valeurs, nil
 }

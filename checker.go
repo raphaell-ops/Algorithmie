@@ -8,21 +8,22 @@ var (
 	ErrLostValue = errors.New("une valeur a disparu")
 )
 
-func Verify(original []int64, cmds []string) (int, error) {
-	s := NewStacks(original)
-	for _, c := range cmds {
-		if err := s.Exec(c); err != nil {
+func Verify(depart []int64, commandes []string) (int, error) {
+	piles := NewStacks(depart)
+	for _, c := range commandes {
+		err := piles.Exec(c)
+		if err != nil {
 			return 0, err
 		}
 	}
-	if len(s.B) != 0 {
+	if len(piles.B) != 0 {
 		return 0, ErrBNotEmpty
 	}
-	if !s.IsSorted() {
+	if !piles.IsSorted() {
 		return 0, ErrNotSorted
 	}
-	if len(s.A) != len(original) {
+	if len(piles.A) != len(depart) {
 		return 0, ErrLostValue
 	}
-	return len(cmds), nil
+	return len(commandes), nil
 }

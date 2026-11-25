@@ -38,10 +38,12 @@ l'autre (testé dans `TestEntreeConservee` et `TestCloneStable`).
 | `SelectionV0` | O(n²), pire cas n(n−1)/2 + 2n | O(n³) | O(n + K) |
 | `SelectionV1` | O(n²), environ n²/4 + 2n au pire | O(n³) | O(n + K) |
 | `Radix` | O(n log n), au plus 2n × ⌈log₂ n⌉ | O(n² log n) | O(n + K) |
-| `BruteForce` | minimal | O(11 × S × n) | O(S × (n + K)) |
+| `BruteForce` | minimal | O(11 × S² × n) | O(S × (n + K)) |
 | `Solve` (n > 5) | min(SelectionV1, Radix) | T(SelectionV1) + T(Radix) | O(n + K) |
 
-S est le nombre d'états gardés par le brute-force.
+S est le nombre d'états gardés par le brute-force. Pour savoir si un état a
+déjà été vu, on parcourt la liste des états gardés (S comparaisons), d'où le S².
+Avec n ≤ 5, S reste inférieur à 700.
 
 **Explications :**
 - **Sélection** : pour chacun des n éléments, on fait jusqu'à n rotations,

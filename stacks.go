@@ -6,27 +6,29 @@ import (
 )
 
 type Stacks struct {
-	A     []int64
-	B     []int64
-	Count int
+	A      []int64
+	B      []int64
+	Compte int
 }
 
 var ErrUnknown = errors.New("instruction inconnue")
 
 var Commands = []string{"sa", "sb", "ss", "pa", "pb", "ra", "rb", "rr", "rra", "rrb", "rrr"}
 
-func NewStacks(values []int64) *Stacks {
-	a := make([]int64, len(values))
-	copy(a, values)
-	return &Stacks{A: a, B: []int64{}}
+func copier(pile []int64) []int64 {
+	copie := make([]int64, len(pile))
+	for i := 0; i < len(pile); i++ {
+		copie[i] = pile[i]
+	}
+	return copie
+}
+
+func NewStacks(valeurs []int64) *Stacks {
+	return &Stacks{A: copier(valeurs), B: []int64{}}
 }
 
 func (s *Stacks) Clone() *Stacks {
-	a := make([]int64, len(s.A))
-	copy(a, s.A)
-	b := make([]int64, len(s.B))
-	copy(b, s.B)
-	return &Stacks{A: a, B: b, Count: s.Count}
+	return &Stacks{A: copier(s.A), B: copier(s.B), Compte: s.Compte}
 }
 
 func (s *Stacks) Key() string {
@@ -45,74 +47,77 @@ func (s *Stacks) IsSorted() bool {
 	return true
 }
 
-func swap(s []int64) {
-	if len(s) < 2 {
+func echanger(pile []int64) {
+	if len(pile) < 2 {
 		return
 	}
-	s[0], s[1] = s[1], s[0]
+	temp := pile[0]
+	pile[0] = pile[1]
+	pile[1] = temp
 }
 
-func push(from, to *[]int64) {
-	if len(*from) == 0 {
+func pousser(source []int64, destination []int64) ([]int64, []int64) {
+	if len(source) == 0 {
+		return source, destination
+	}
+	haut := source[0]
+	source = source[1:]
+	destination = append([]int64{haut}, destination...)
+	return source, destination
+}
+
+func tourner(pile []int64) {
+	if len(pile) < 2 {
 		return
 	}
-	top := (*from)[0]
-	*from = (*from)[1:]
-	*to = append([]int64{top}, *to...)
+	haut := pile[0]
+	for i := 0; i < len(pile)-1; i++ {
+		pile[i] = pile[i+1]
+	}
+	pile[len(pile)-1] = haut
 }
 
-func rotate(s []int64) {
-	if len(s) < 2 {
+func tournerInverse(pile []int64) {
+	if len(pile) < 2 {
 		return
 	}
-	top := s[0]
-	for i := 0; i < len(s)-1; i++ {
-		s[i] = s[i+1]
+	bas := pile[len(pile)-1]
+	for i := len(pile) - 1; i > 0; i-- {
+		pile[i] = pile[i-1]
 	}
-	s[len(s)-1] = top
+	pile[0] = bas
 }
 
-func reverseRotate(s []int64) {
-	if len(s) < 2 {
-		return
-	}
-	bottom := s[len(s)-1]
-	for i := len(s) - 1; i > 0; i-- {
-		s[i] = s[i-1]
-	}
-	s[0] = bottom
-}
-
-func (s *Stacks) Exec(cmd string) error {
-	switch cmd {
+func (s *Stacks) Exec(commande string) error {
+	switch commande {
 	case "sa":
-		swap(s.A)
+		echanger(s.A)
 	case "sb":
-		swap(s.B)
+		echanger(s.B)
 	case "ss":
-		swap(s.A)
-		swap(s.B)
+		echanger(s.A)
+		echanger(s.B)
 	case "pa":
-		push(&s.B, &s.A)
+		s.B, s.A = pousser(s.B, s.A)
 	case "pb":
-		push(&s.A, &s.B)
+		s.A, s.B = pousser(s.A, s.B)
 	case "ra":
-		rotate(s.A)
+		tourner(s.A)
 	case "rb":
-		rotate(s.B)
+		tourner(s.B)
 	case "rr":
-		rotate(s.A)
-		rotate(s.B)
+		tourner(s.A)
+		tourner(s.B)
 	case "rra":
-		reverseRotate(s.A)
+		tournerInverse(s.A)
 	case "rrb":
-		reverseRotate(s.B)
+		tournerInverse(s.B)
 	case "rrr":
-		reverseRotate(s.A)
-		reverseRotate(s.B)
+		tournerInverse(s.A)
+		tournerInverse(s.B)
 	default:
 		return ErrUnknown
 	}
-	s.Count++
+	s.Compte++
 	return nil
 }

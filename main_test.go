@@ -79,8 +79,8 @@ func TestCommandes(t *testing.T) {
 		if !reflect.DeepEqual(s.A, tt.wantA) || !reflect.DeepEqual(s.B, tt.wantB) {
 			t.Errorf("%s : A=%v B=%v ; attendu A=%v B=%v", tt.cmd, s.A, s.B, tt.wantA, tt.wantB)
 		}
-		if s.Count != 1 {
-			t.Errorf("%s : score %d, attendu 1", tt.cmd, s.Count)
+		if s.Compte != 1 {
+			t.Errorf("%s : score %d, attendu 1", tt.cmd, s.Compte)
 		}
 	}
 }
@@ -108,8 +108,8 @@ func TestCommandesCasLimites(t *testing.T) {
 		if !reflect.DeepEqual(s.A, tt.wantA) || !reflect.DeepEqual(s.B, tt.wantB) {
 			t.Errorf("%s sur A=%v B=%v : obtenu A=%v B=%v", tt.cmd, tt.a, tt.b, s.A, s.B)
 		}
-		if s.Count != 1 {
-			t.Errorf("%s : score %d, attendu 1", tt.cmd, s.Count)
+		if s.Compte != 1 {
+			t.Errorf("%s : score %d, attendu 1", tt.cmd, s.Compte)
 		}
 	}
 }
@@ -119,7 +119,7 @@ func TestCommandeInconnue(t *testing.T) {
 	if err := s.Exec("xx"); err != ErrUnknown {
 		t.Errorf("erreur attendue, obtenu %v", err)
 	}
-	if !reflect.DeepEqual(s.A, []int64{2, 1}) || s.Count != 0 {
+	if !reflect.DeepEqual(s.A, []int64{2, 1}) || s.Compte != 0 {
 		t.Error("une commande inconnue a modifié les piles ou le score")
 	}
 }
@@ -247,20 +247,23 @@ var entrees = [][]int64{
 }
 
 func TestStrategiesValides(t *testing.T) {
-	strategies := map[string]func([]int64) []string{
-		"SelectionV0": SelectionV0,
-		"SelectionV1": SelectionV1,
-		"Radix":       Radix,
-		"Solve":       Solve,
+	strategies := []struct {
+		nom string
+		f   func([]int64) []string
+	}{
+		{"SelectionV0", SelectionV0},
+		{"SelectionV1", SelectionV1},
+		{"Radix", Radix},
+		{"Solve", Solve},
 	}
-	for nom, f := range strategies {
+	for _, s := range strategies {
 		for _, e := range entrees {
-			if _, err := Verify(e, f(e)); err != nil {
-				t.Errorf("%s sur %v : %v", nom, e, err)
+			if _, err := Verify(e, s.f(e)); err != nil {
+				t.Errorf("%s sur %v : %v", s.nom, e, err)
 			}
 		}
-		if len(f([]int64{})) != 0 || len(f([]int64{7})) != 0 || len(f([]int64{1, 2, 3})) != 0 {
-			t.Errorf("%s : des commandes pour une entrée déjà triée", nom)
+		if len(s.f([]int64{})) != 0 || len(s.f([]int64{7})) != 0 || len(s.f([]int64{1, 2, 3})) != 0 {
+			t.Errorf("%s : des commandes pour une entrée déjà triée", s.nom)
 		}
 	}
 }

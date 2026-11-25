@@ -2,44 +2,53 @@ package main
 
 const Budget = 100000
 
-type candidate struct {
-	state *Stacks
-	cmds  []string
+type etat struct {
+	piles     *Stacks
+	commandes []string
 }
 
-func BruteForce(values []int64) (cmds []string, found bool, explored int) {
-	start := NewStacks(values)
-	if start.IsSorted() {
+func dejaVu(vus []string, cle string) bool {
+	for _, v := range vus {
+		if v == cle {
+			return true
+		}
+	}
+	return false
+}
+
+func BruteForce(valeurs []int64) (cmds []string, found bool, explored int) {
+	depart := NewStacks(valeurs)
+	if depart.IsSorted() {
 		return []string{}, true, 1
 	}
 
-	queue := []candidate{{state: start, cmds: []string{}}}
-	seen := map[string]bool{start.Key(): true}
+	file := []etat{{piles: depart, commandes: []string{}}}
+	vus := []string{depart.Key()}
 
-	for i := 0; i < len(queue); i++ {
-		current := queue[i]
+	for i := 0; i < len(file); i++ {
+		actuel := file[i]
 		for _, c := range Commands {
-			next := current.state.Clone()
-			next.Exec(c)
+			suivant := actuel.piles.Clone()
+			suivant.Exec(c)
 
-			key := next.Key()
-			if seen[key] {
+			cle := suivant.Key()
+			if dejaVu(vus, cle) {
 				continue
 			}
-			seen[key] = true
+			vus = append(vus, cle)
 
-			path := make([]string, len(current.cmds))
-			copy(path, current.cmds)
-			path = append(path, c)
+			chemin := make([]string, len(actuel.commandes))
+			copy(chemin, actuel.commandes)
+			chemin = append(chemin, c)
 
-			if next.IsSorted() {
-				return path, true, len(seen)
+			if suivant.IsSorted() {
+				return chemin, true, len(vus)
 			}
-			if len(seen) >= Budget {
-				return nil, false, len(seen)
+			if len(vus) >= Budget {
+				return nil, false, len(vus)
 			}
-			queue = append(queue, candidate{state: next, cmds: path})
+			file = append(file, etat{piles: suivant, commandes: chemin})
 		}
 	}
-	return nil, false, len(seen)
+	return nil, false, len(vus)
 }

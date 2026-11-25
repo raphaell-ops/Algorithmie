@@ -14,11 +14,11 @@ go test -run ToutesPermutations -v  # mesures du brute-force
 
 | Fichier | Contenu |
 |---|---|
-| `parser.go` | J1 : lecture et vérification des nombres |
-| `stacks.go` | J2 : les deux piles et les 11 commandes |
-| `checker.go` | J2 : le vérificateur |
-| `brute.go` | J3 : la recherche brute-force |
-| `solver.go` | J5/J6 : les stratégies |
+| `parser.go` | lecture et vérification des nombres |
+| `stacks.go` | les deux piles et les 11 commandes |
+| `checker.go` | le vérificateur |
+| `brute.go` | la recherche brute-force |
+| `solver.go` | les stratégies |
 | `main.go` | le programme |
 | `main_test.go` | tous les tests et les mesures |
 | `CONTRAT.md` | entrée, commandes, sorties, statuts et cas limites |
